@@ -4,12 +4,6 @@ from transformers import RobertaForSequenceClassification  # type: ignore
 from transformers import RobertaTokenizer  # type: ignore
 from transformers import pipeline  # type: ignore
 import re
-from pydantic import BaseModel
-
-
-class TextPayload(BaseModel):
-    text: str
-
 
 app = FastAPI()
 
@@ -69,7 +63,7 @@ def hello():
 
 
 @app.post("/predict_sentiment")
-async def display_sentiment(payload: TextPayload):
+async def display_sentiment(text: str):
     """
     Endpoint to upload a text, text processing,
     generate a sentiment classification,
@@ -82,8 +76,7 @@ async def display_sentiment(payload: TextPayload):
         Response: The response containing the predicted sentiment.
     """
     model, tokenizer = load_saving_model()
-    text = preprocess_text(payload.text)
-    classifier = pipeline("text-classification", model=model,
-                          tokenizer=tokenizer)
+    text = preprocess_text(text)
+    classifier = pipeline("text-classification", model=model, tokenizer=tokenizer)
     result = classifier(text)
     return result
