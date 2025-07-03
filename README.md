@@ -22,8 +22,8 @@ With sentiment classification capabilities, my API offers the ability to integra
 You can't use my training model because of Github storage. But if you train your own model you can install and use my repository like this.  
 
 ```bash
-git clone https://github.com/HaDock404/api-vision-futur_transport.git
-cd api-vision-futur_transport
+git clone https://github.com/HaDock404/api-nlp-pretrained_roberta.git
+cd api-nlp-pretrained_roberta
 pip install -r ./packages/requirements.txt
 ```  
 

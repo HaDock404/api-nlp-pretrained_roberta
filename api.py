@@ -5,6 +5,9 @@ from transformers import RobertaTokenizer  # type: ignore
 from transformers import pipeline  # type: ignore
 import re
 from pydantic import BaseModel
+import tensorflow as tf
+import os
+import zipfile
 
 
 class TextPayload(BaseModel):
@@ -22,18 +25,52 @@ app.add_middleware(
 )
 
 
+# def load_saving_model():
+#    """
+#    Load the pre-trained model for sentiment classification.
+
+#    Returns:
+#        from_pretrained.model: The loaded model.
+#        from_pretrained.tokenizer: The loaded tokenizer.
+#    """
+#   tokenizer_path = "./models/tokenizer_roberta"
+#   model_path = "./models/model_roberta"
+
+#   tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
+#   model = RobertaForSequenceClassification.from_pretrained(model_path)
+#    return model, tokenizer
+
+def download_and_extract(zip_url, extract_to):
+    local_zip = tf.keras.utils.get_file(
+        fname=os.path.basename(zip_url),
+        origin=zip_url,
+        extract=False
+    )
+    with zipfile.ZipFile(local_zip, 'r') as zip_ref:
+        zip_ref.extractall(extract_to)
+
+
 def load_saving_model():
     """
     Load the pre-trained model for sentiment classification.
-
-    Returns:
-        from_pretrained.model: The loaded model.
-        from_pretrained.tokenizer: The loaded tokenizer.
     """
-    tokenizer_path = "./models/tokenizer_roberta"
-    model_path = "./models/model_roberta"
-    tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
-    model = RobertaForSequenceClassification.from_pretrained(model_path)
+    model_zip_gcs = \
+        "https://storage.googleapis.com/hadock404-models/model_roberta.zip"
+    tokenizer_zip_gcs = \
+        "https://storage.googleapis.com/hadock404-models/tokenizer_roberta.zip"
+
+    model_local_dir = "/tmp/model_roberta"
+    tokenizer_local_dir = "/tmp/tokenizer_roberta"
+
+    if not os.path.exists(model_local_dir):
+        download_and_extract(model_zip_gcs, "/tmp/")
+
+    if not os.path.exists(tokenizer_local_dir):
+        download_and_extract(tokenizer_zip_gcs, "/tmp/")
+
+    tokenizer = RobertaTokenizer.from_pretrained(tokenizer_local_dir)
+    model = RobertaForSequenceClassification.from_pretrained(model_local_dir)
+
     return model, tokenizer
 
 
